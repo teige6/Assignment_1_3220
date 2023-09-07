@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Array Demo - Results</title>
+</head>
+<body>
+    <h1>Array Data</h1>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Retrieve user inputs from the form
+        $numRows = $_POST["numRows"];
+        $numCols = $_POST["numCols"];
+        $minValue = $_POST["minValue"];
+        $maxValue = $_POST["maxValue"];
+
+        // Initialize and populate the 2D array with random values
+        $array = [];
+        for ($i = 0; $i < $numRows; $i++) {
+            $row = [];
+            for ($j = 0; $j < $numCols; $j++) {
+                $row[] = rand($minValue, $maxValue);
+            }
+            $array[] = $row;
+        }
+
+        // Function to calculate standard deviation
+        function calculateStdDev($data) {
+            $mean = array_sum($data) / count($data);
+            $variance = array_sum(array_map(function($x) use ($mean) {
+                return pow($x - $mean, 2);
+            }, $data)) / count($data);
+            return sqrt($variance);
+        }
+
+        // Print the array in a table
+        echo '<h2>Original Array</h2>';
+        echo '<table border="1">';
+        foreach ($array as $row) {
+            echo '<tr>';
+            foreach ($row as $value) {
+                echo '<td>' . $value . '</td>';
+            }
+            echo '</tr>';
+        }
+        echo '</table>';
+
+        // Process data and create the second table
+        echo '<h2>Data Processing</h2>';
+        echo '<table border="1">';
+        echo '<tr><th>Row</th><th>Sum</th><th>Average</th><th>Std Deviation</th></tr>';
+        foreach ($array as $rowIndex => $rowData) {
+            $rowSum = array_sum($rowData);
+            $rowAverage = $rowSum / $numCols;
+            $rowStdDev = calculateStdDev($rowData);
+
+            echo '<tr>';
+            echo '<td>' . ($rowIndex + 1) . '</td>';
+            echo '<td>' . $rowSum . '</td>';
+            echo '<td>' . number_format($rowAverage, 3) . '</td>';
+            echo '<td>' . number_format($rowStdDev, 3) . '</td>';
+            echo '</tr>';
+        }
+        echo '</table>';
+
+        // Process data and create the third table
+        echo '<h2>Data Processing (2nd Table)</h2>';
+        echo '<table border="1">';
+        echo '<tr><th>Original Value</th><th>Positive/Negative/Zero</th></tr>';
+        foreach ($array as $rowData) {
+            foreach ($rowData as $value) {
+                echo '<tr>';
+                echo '<td>' . $value . '</td>';
+                if ($value > 0) {
+                    echo '<td>positive</td>';
+                } elseif ($value < 0) {
+                    echo '<td>negative</td>';
+                } else {
+                    echo '<td>zero</td>';
+                }
+                echo '</tr>';
+            }
+        }
+        echo '</table>';
+    } else {
+        echo '<p>No data submitted.</p>';
+    }
+    ?>
+
+    <br>
+    <a href="arrayDemo.html">Back to Input Form</a>
+</body>
+</html>
